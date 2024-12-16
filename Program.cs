@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024Day5
+﻿using System.Collections.Generic;
+
+namespace AdventOfCode2024Day5
 {
     internal class Program
     {
@@ -7,8 +9,10 @@
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "input.txt");
 
             List<(int x, int y)> rules = new();
+            List<List<int>> invalidLines = new();
 
             int result = 0;
+            int result2 = 0;
 
             using (StreamReader sr = new StreamReader(path))
             {
@@ -33,6 +37,7 @@
 
                     List<(int x, int y)> applicablerules = new();
 
+
                     bool isValableLine = true;
 
                     foreach (var rule in rules)
@@ -54,6 +59,7 @@
                         if (indexX >= indexY)
                         {
                             isValableLine = false;
+                            invalidLines.Add(numberToVerify);
                             break;
                         }                        
                     }
@@ -67,7 +73,37 @@
                     line = sr.ReadLine();
                 }
 
-                Console.WriteLine(result.ToString());
+                Console.WriteLine("Premiere partie : " + result.ToString());
+
+                // seconde partie : corriger les lignes restantes
+                foreach (var list in invalidLines)
+                {
+                    bool isValableLine = false;
+                    do
+                    {
+                        isValableLine = true;
+                    
+                        foreach (var rule in rules)
+                        {
+                            if (list.Contains(rule.x) && list.Contains(rule.y))
+                            {
+                                int indexX = list.IndexOf(rule.x);
+                                int indexY = list.IndexOf(rule.y);
+
+                                if (indexX > indexY)
+                                {
+                                    list.RemoveAt(indexX);
+                                    list.Insert(indexY, rule.x);
+                                    isValableLine = false;
+                                }
+                            }                            
+                        } 
+                    }
+                    while (!isValableLine);
+
+                    result2 += list[list.Count / 2];
+                }
+                Console.WriteLine("Deuxieme partie : " + result2.ToString());
             }
         }
     }
